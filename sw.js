@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wallet-buddy-offline-v1';
+const CACHE_NAME = 'wallet-buddy-offline-v2';
 const ASSETS = [
   './',
   './index.html',

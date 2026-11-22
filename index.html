@@ -6,23 +6,22 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="荷包管家" />
-  <meta name="theme-color" content="#F2F2F7" />
+  <meta name="theme-color" content="#FAFAFA" />
   <title>荷包管家</title>
   <link rel="manifest" href="./manifest.json" />
   <link rel="apple-touch-icon" href="./icon-192.png" />
   <style>
     :root {
-      --bg: #F2F2F7;
-      --card: #FFFFFF;
-      --text: #1C1C1E;
-      --sub: #8E8E93;
-      --border: #E5E5EA;
-      --blue: #007AFF;
-      --blue-soft: #EBF4FF;
-      --green: #34C759;
-      --orange: #FF9500;
-      --red: #FF3B30;
-      --purple: #AF52DE;
+      --bg: #FAFAFA;
+      --surface: #FFFFFF;
+      --surface-alt: #F3F3F2;
+      --ink: #111111;
+      --ink-2: #555555;
+      --ink-3: #8E8E93;
+      --line: #E8E8E6;
+      --line-strong: #D4D4D0;
+      --danger: #C93B3B;
+      --ok: #2E7D5B;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
@@ -30,8 +29,8 @@
     html, body {
       margin: 0; padding: 0;
       background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang HK", "Helvetica Neue", sans-serif;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang HK", "Helvetica Neue", sans-serif;
       overscroll-behavior-y: none;
       -webkit-font-smoothing: antialiased;
     }
@@ -40,241 +39,287 @@
       padding-bottom: calc(84px + var(--safe-bottom));
       min-height: 100vh;
     }
-    .container { max-width: 500px; margin: 0 auto; padding: 12px 16px 24px; }
+    .num { font-variant-numeric: tabular-nums; }
+    .container { max-width: 480px; margin: 0 auto; padding: 14px 18px 28px; }
+
+    /* Header */
     .header {
+      display: flex; align-items: baseline; justify-content: space-between;
+      padding: 6px 0 16px;
+    }
+    .header h1 {
+      margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.4px;
+    }
+    .status-dot {
+      font-size: 11px; color: var(--ink-3); letter-spacing: 0.3px;
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .status-dot::before {
+      content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ok);
+    }
+
+    /* Segmented Controls */
+    .seg {
+      display: grid; background: var(--surface-alt);
+      padding: 3px; border-radius: 10px; margin-bottom: 12px;
+    }
+    .seg-3 { grid-template-columns: repeat(3, 1fr); }
+    .seg-2 { grid-template-columns: repeat(2, 1fr); }
+    .seg-btn {
+      border: none; background: transparent; padding: 7px 4px; border-radius: 8px;
+      font-size: 13px; font-weight: 500; color: var(--ink-3); cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .seg-btn.active {
+      background: var(--surface); color: var(--ink); font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+
+    /* Date / Cycle Navigator */
+    .nav-bar {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 8px 0 14px;
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 12px; padding: 8px 10px; margin-bottom: 14px;
     }
-    .header h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.4px; }
-    .offline-pill {
-      font-size: 11px; font-weight: 600; color: var(--green);
-      background: #E8F8ED; padding: 4px 10px; border-radius: 999px;
-      display: inline-flex; align-items: center; gap: 4px;
-    }
-    .cycle-bar {
-      display: flex; align-items: center; justify-content: space-between;
-      background: var(--card); border-radius: 14px; padding: 8px 10px;
-      margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    }
-    .cycle-btn {
-      border: none; background: var(--bg); color: var(--blue);
-      width: 34px; height: 34px; border-radius: 10px; font-size: 18px; font-weight: 600;
+    .nav-arrow {
+      border: none; background: transparent; color: var(--ink);
+      width: 32px; height: 32px; border-radius: 8px; font-size: 18px;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
-    .cycle-btn:active { opacity: 0.6; }
-    .cycle-label { text-align: center; }
-    .cycle-label .main { font-size: 15px; font-weight: 600; }
-    .cycle-label .sub { font-size: 12px; color: var(--sub); margin-top: 2px; }
+    .nav-arrow:active { background: var(--surface-alt); }
+    .nav-center { text-align: center; flex: 1; }
+    .nav-center .main { font-size: 14px; font-weight: 600; }
+    .nav-center .sub { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
 
+    .period-picker {
+      display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center;
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 12px; padding: 10px 12px; margin-bottom: 14px;
+    }
+    .period-picker input[type="date"] {
+      border: none; background: var(--surface-alt); padding: 7px 8px;
+      border-radius: 8px; font-size: 13px; text-align: center;
+    }
+
+    /* Minimal Flat Cards */
     .card {
-      background: var(--card); border-radius: 18px; padding: 16px;
-      margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.035);
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 14px; padding: 18px; margin-bottom: 14px;
     }
-    .card-title {
-      font-size: 15px; font-weight: 600; margin: 0 0 12px;
+    .card-head {
       display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
     }
-    .summary-top { display: flex; justify-content: space-between; align-items: flex-end; }
-    .big-num { font-size: 32px; font-weight: 700; letter-spacing: -0.8px; }
-    .muted { color: var(--sub); font-size: 13px; }
+    .card-title { font-size: 13px; font-weight: 600; color: var(--ink-2); letter-spacing: 0.2px; }
+    .muted { color: var(--ink-3); font-size: 12px; }
+
+    .hero-amt {
+      font-size: 34px; font-weight: 600; letter-spacing: -1px; line-height: 1.1;
+      margin: 4px 0 0;
+    }
     .progress-track {
-      height: 10px; background: #ECECF1; border-radius: 999px; overflow: hidden; margin: 12px 0;
+      height: 5px; background: var(--surface-alt); border-radius: 999px;
+      overflow: hidden; margin: 16px 0 14px;
     }
     .progress-fill {
-      height: 100%; border-radius: 999px; transition: width 0.35s ease;
+      height: 100%; border-radius: 999px; background: var(--ink);
+      transition: width 0.3s ease;
     }
-    .stat-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;
+    .meta-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      padding-top: 12px; border-top: 1px solid var(--line);
     }
-    .stat-box {
-      background: var(--bg); border-radius: 12px; padding: 10px 12px;
-    }
-    .stat-box .lbl { font-size: 12px; color: var(--sub); }
-    .stat-box .val { font-size: 16px; font-weight: 700; margin-top: 3px; }
+    .meta-item .lbl { font-size: 11px; color: var(--ink-3); }
+    .meta-item .val { font-size: 15px; font-weight: 600; margin-top: 3px; }
 
-    /* Pie Chart */
-    .pie-wrap {
-      display: flex; flex-direction: column; align-items: center;
-    }
-    .pie-svg-box { position: relative; width: 210px; height: 210px; margin: 4px 0 12px; }
+    /* Minimal Donut Chart */
+    .pie-wrap { display: flex; flex-direction: column; align-items: center; }
+    .pie-box { position: relative; width: 196px; height: 196px; margin: 2px 0 14px; }
     .pie-center {
       position: absolute; inset: 0; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; pointer-events: none; text-align: center;
-      padding: 0 28px;
+      align-items: center; justify-content: center; pointer-events: none;
+      text-align: center; padding: 0 24px;
     }
-    .pie-center .c-name { font-size: 13px; color: var(--sub); font-weight: 500; }
-    .pie-center .c-pct { font-size: 24px; font-weight: 700; margin: 2px 0; }
-    .pie-center .c-amt { font-size: 13px; color: var(--text); font-weight: 600; }
+    .pie-center .c-name { font-size: 12px; color: var(--ink-3); }
+    .pie-center .c-pct { font-size: 24px; font-weight: 600; margin: 2px 0; color: var(--ink); }
+    .pie-center .c-amt { font-size: 12px; color: var(--ink-2); }
+
     .cat-list { width: 100%; }
     .cat-row {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 8px; border-radius: 12px; cursor: pointer;
-      transition: background 0.15s;
+      padding: 9px 6px; border-radius: 8px; cursor: pointer;
     }
-    .cat-row.active, .cat-row:active { background: var(--bg); }
+    .cat-row.active { background: var(--surface-alt); }
     .cat-left { display: flex; align-items: center; gap: 10px; }
-    .cat-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-    .cat-icon { font-size: 18px; }
-    .cat-name { font-size: 15px; font-weight: 500; }
-    .cat-right { text-align: right; }
-    .cat-amt { font-size: 15px; font-weight: 600; }
-    .cat-pct { font-size: 12px; color: var(--sub); }
+    .cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .cat-name { font-size: 14px; font-weight: 500; }
+    .cat-right { display: flex; align-items: baseline; gap: 10px; }
+    .cat-amt { font-size: 14px; font-weight: 600; }
+    .cat-pct { font-size: 12px; color: var(--ink-3); min-width: 42px; text-align: right; }
 
-    /* Transaction List */
+    /* Grouped Daily Transactions */
+    .day-group { margin-bottom: 14px; }
+    .day-group:last-child { margin-bottom: 0; }
+    .day-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 0; border-bottom: 1px solid var(--line);
+      font-size: 12px; color: var(--ink-3); font-weight: 500;
+    }
+    .day-header .day-sum { color: var(--ink-2); font-weight: 600; }
+
     .tx-item {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 11px 0; border-bottom: 1px solid var(--border);
+      padding: 11px 0; border-bottom: 1px solid var(--surface-alt);
     }
     .tx-item:last-child { border-bottom: none; }
-    .tx-left { display: flex; align-items: center; gap: 11px; min-width: 0; }
-    .tx-badge {
-      width: 38px; height: 38px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;
-    }
+    .tx-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .tx-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
     .tx-info { min-width: 0; }
-    .tx-note { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .tx-meta { font-size: 12px; color: var(--sub); margin-top: 2px; }
+    .tx-note { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tx-meta { font-size: 11px; color: var(--ink-3); margin-top: 2px; }
     .tx-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-    .tx-price { font-size: 16px; font-weight: 600; text-align: right; }
-    .tx-subprice { font-size: 11px; color: var(--sub); text-align: right; }
-    .del-btn {
-      border: none; background: #FFF0EF; color: var(--red);
-      width: 28px; height: 28px; border-radius: 8px; font-size: 14px; cursor: pointer;
+    .tx-price { font-size: 14px; font-weight: 600; text-align: right; }
+    .tx-subprice { font-size: 11px; color: var(--ink-3); text-align: right; }
+    .icon-del {
+      border: none; background: transparent; color: var(--ink-3);
+      width: 26px; height: 26px; border-radius: 6px; font-size: 14px; cursor: pointer;
     }
+    .icon-del:active { background: var(--surface-alt); color: var(--danger); }
 
     /* Bottom Tab Bar */
     .tabbar {
       position: fixed; left: 0; right: 0; bottom: 0;
-      background: rgba(255,255,255,0.88);
-      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-      border-top: 1px solid rgba(0,0,0,0.08);
-      padding: 6px 10px calc(8px + var(--safe-bottom));
+      background: rgba(250,250,250,0.92);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--line);
+      padding: 8px 12px calc(10px + var(--safe-bottom));
       display: flex; justify-content: space-around; align-items: center;
       z-index: 50;
     }
     .tab-btn {
-      border: none; background: none; color: var(--sub);
-      display: flex; flex-direction: column; align-items: center; gap: 3px;
-      font-size: 11px; font-weight: 500; cursor: pointer; min-width: 60px; padding: 4px 0;
+      border: none; background: none; color: var(--ink-3);
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 500; cursor: pointer; min-width: 60px; padding: 2px 0;
     }
-    .tab-btn.active { color: var(--blue); }
-    .tab-icon { font-size: 21px; line-height: 1; }
+    .tab-btn.active { color: var(--ink); font-weight: 600; }
+    .tab-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.7; }
+
     .add-fab {
-      width: 52px; height: 52px; border-radius: 26px; border: none;
-      background: var(--blue); color: #fff; font-size: 30px; font-weight: 400;
+      width: 48px; height: 48px; border-radius: 24px; border: none;
+      background: var(--ink); color: #fff; font-size: 26px; font-weight: 300;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 6px 16px rgba(0,122,255,0.35); cursor: pointer;
-      margin-top: -18px;
+      cursor: pointer; margin-top: -14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.16);
     }
     .add-fab:active { transform: scale(0.94); }
 
-    /* Modal / Sheet */
+    /* Modals / Sheets */
     .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.42);
+      position: fixed; inset: 0; background: rgba(0,0,0,0.35);
       z-index: 100; display: none; align-items: flex-end; justify-content: center;
     }
     .modal-backdrop.open { display: flex; }
     .sheet {
-      width: 100%; max-width: 500px; max-height: 92vh; overflow-y: auto;
-      background: var(--bg); border-radius: 24px 24px 0 0;
-      padding: 14px 16px calc(20px + var(--safe-bottom));
-      animation: slideUp 0.22s ease-out;
+      width: 100%; max-width: 480px; max-height: 92vh; overflow-y: auto;
+      background: var(--bg); border-radius: 20px 20px 0 0;
+      padding: 12px 18px calc(20px + var(--safe-bottom));
+      animation: slideUp 0.2s ease-out;
     }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .sheet-handle {
-      width: 40px; height: 5px; background: #D1D1D6; border-radius: 999px; margin: 0 auto 12px;
+      width: 36px; height: 4px; background: var(--line-strong); border-radius: 999px; margin: 0 auto 12px;
     }
     .sheet-head {
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
     }
-    .sheet-head h2 { margin: 0; font-size: 18px; }
+    .sheet-head h2 { margin: 0; font-size: 16px; font-weight: 600; }
     .close-btn {
-      border: none; background: #E5E5EA; color: var(--text);
-      width: 30px; height: 30px; border-radius: 15px; font-size: 16px; cursor: pointer;
+      border: none; background: var(--surface-alt); color: var(--ink-2);
+      width: 28px; height: 28px; border-radius: 14px; font-size: 14px; cursor: pointer;
     }
 
-    /* Quick Entry Form */
-    .seg-control {
-      display: grid; grid-template-columns: 1fr 1fr; background: #E5E5EA;
-      padding: 3px; border-radius: 11px; margin-bottom: 12px;
-    }
-    .seg-btn {
-      border: none; background: transparent; padding: 7px; border-radius: 9px;
-      font-size: 14px; font-weight: 600; color: var(--sub); cursor: pointer;
-    }
-    .seg-btn.active { background: #fff; color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    /* Quick Entry */
     .presets {
-      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 8px;
+      display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 6px;
       scrollbar-width: none;
     }
     .presets::-webkit-scrollbar { display: none; }
     .preset-chip {
-      border: 1px solid var(--border); background: #fff; color: var(--text);
-      border-radius: 999px; padding: 6px 12px; font-size: 13px; white-space: nowrap; cursor: pointer;
+      border: 1px solid var(--line); background: var(--surface); color: var(--ink-2);
+      border-radius: 999px; padding: 5px 11px; font-size: 12px; white-space: nowrap; cursor: pointer;
     }
-    .preset-chip:active { background: var(--blue-soft); border-color: var(--blue); }
+    .preset-chip:active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
     .amount-display {
-      background: #fff; border-radius: 14px; padding: 12px 14px;
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+      background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+      padding: 12px 14px; display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
     }
-    .amount-curr { font-size: 16px; font-weight: 600; color: var(--sub); }
-    .amount-expr { font-size: 28px; font-weight: 700; text-align: right; overflow-x: auto; }
+    .amount-curr { font-size: 14px; font-weight: 500; color: var(--ink-3); }
+    .amount-expr { font-size: 28px; font-weight: 600; text-align: right; overflow-x: auto; }
+
     .cat-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;
     }
     .cat-pill {
-      border: 1.5px solid transparent; background: #fff; border-radius: 12px;
-      padding: 8px 4px; text-align: center; cursor: pointer; font-size: 12px;
+      border: 1px solid var(--line); background: var(--surface); border-radius: 10px;
+      padding: 9px 4px; text-align: center; cursor: pointer; font-size: 12px; color: var(--ink-2);
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
     }
-    .cat-pill.active { border-color: var(--blue); background: var(--blue-soft); color: var(--blue); font-weight: 600; }
-    .cat-pill .e { font-size: 20px; display: block; margin-bottom: 2px; }
-    .input-row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; margin-bottom: 10px; }
-    input[type="text"], input[type="number"], input[type="date"], select {
-      width: 100%; border: 1px solid var(--border); background: #fff;
-      border-radius: 11px; padding: 10px 12px; font-size: 15px; font-family: inherit;
-      color: var(--text); outline: none;
-    }
-    input:focus, select:focus { border-color: var(--blue); }
-    .keypad {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
-    }
-    .key {
-      border: none; background: #fff; border-radius: 12px; height: 46px;
-      font-size: 20px; font-weight: 600; color: var(--text); cursor: pointer;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-    }
-    .key:active { background: #E5E5EA; }
-    .key.op { background: #EBF4FF; color: var(--blue); }
-    .key.save {
-      background: var(--blue); color: #fff; font-size: 16px; grid-row: span 2; height: auto;
+    .cat-pill .d { width: 8px; height: 8px; border-radius: 50%; }
+    .cat-pill.active {
+      border-color: var(--ink); background: var(--ink); color: #fff; font-weight: 500;
     }
 
-    /* Buttons & Settings */
+    .input-row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; margin-bottom: 10px; }
+    input[type="text"], input[type="number"], input[type="date"], select {
+      width: 100%; border: 1px solid var(--line); background: var(--surface);
+      border-radius: 10px; padding: 9px 11px; font-size: 14px; font-family: inherit;
+      color: var(--ink); outline: none;
+    }
+    input:focus, select:focus { border-color: var(--ink); }
+
+    .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .key {
+      border: 1px solid var(--line); background: var(--surface); border-radius: 10px; height: 46px;
+      font-size: 19px; font-weight: 500; color: var(--ink); cursor: pointer;
+    }
+    .key:active { background: var(--surface-alt); }
+    .key.op { background: var(--surface-alt); color: var(--ink-2); border-color: transparent; }
+    .key.save {
+      background: var(--ink); color: #fff; border-color: var(--ink);
+      font-size: 15px; font-weight: 600; grid-row: span 2; height: auto;
+    }
+
+    /* Buttons */
     .btn {
-      border: none; border-radius: 12px; padding: 11px 14px; font-size: 15px; font-weight: 600;
+      border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+      border-radius: 10px; padding: 10px 14px; font-size: 14px; font-weight: 500;
       cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     }
-    .btn-primary { background: var(--blue); color: #fff; width: 100%; }
-    .btn-soft { background: var(--blue-soft); color: var(--blue); }
-    .btn-green { background: #E8F8ED; color: #1E9E43; }
-    .btn-red { background: #FFF0EF; color: var(--red); }
-    .btn-sm { padding: 7px 11px; font-size: 13px; border-radius: 9px; }
+    .btn:active { background: var(--surface-alt); }
+    .btn-dark { background: var(--ink); color: #fff; border-color: var(--ink); width: 100%; }
+    .btn-dark:active { opacity: 0.85; background: var(--ink); }
+    .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+    .btn-danger { color: var(--danger); border-color: #F2D6D6; background: #FFF9F9; }
 
     .setting-row {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 0; border-bottom: 1px solid var(--border); gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid var(--line); gap: 12px;
     }
     .setting-row:last-child { border-bottom: none; }
-    .setting-row label { font-size: 15px; font-weight: 500; }
-    .setting-row small { display: block; color: var(--sub); font-size: 12px; margin-top: 2px; }
-    .empty { text-align: center; color: var(--sub); padding: 26px 12px; font-size: 14px; }
+    .setting-row label { font-size: 14px; font-weight: 500; }
+    .setting-row small { display: block; color: var(--ink-3); font-size: 11px; margin-top: 2px; }
+
+    .empty { text-align: center; color: var(--ink-3); padding: 28px 12px; font-size: 13px; }
     .view { display: none; }
     .view.active { display: block; }
+
     .toast {
       position: fixed; top: calc(16px + var(--safe-top)); left: 50%; transform: translateX(-50%);
-      background: rgba(28,28,30,0.92); color: #fff; padding: 10px 18px; border-radius: 999px;
-      font-size: 14px; font-weight: 500; z-index: 200; opacity: 0; pointer-events: none;
-      transition: opacity 0.25s;
+      background: var(--ink); color: #fff; padding: 9px 16px; border-radius: 999px;
+      font-size: 13px; font-weight: 500; z-index: 200; opacity: 0; pointer-events: none;
+      transition: opacity 0.2s; white-space: nowrap;
     }
     .toast.show { opacity: 1; }
   </style>
@@ -286,56 +331,65 @@
   <div id="view-home" class="view active container">
     <div class="header">
       <h1>荷包管家</h1>
-      <span class="offline-pill">● 本機離線</span>
+      <span class="status-dot">離線本機</span>
     </div>
 
-    <div class="cycle-bar">
-      <button class="cycle-btn" id="prev-cycle" aria-label="上個週期">‹</button>
-      <div class="cycle-label">
-        <div class="main" id="cycle-range-text">-</div>
-        <div class="sub" id="cycle-days-left">-</div>
+    <!-- Mode Switcher: Cycle / Daily / Custom Period -->
+    <div class="seg seg-3" id="home-mode-seg">
+      <button class="seg-btn active" data-hmode="cycle">月度週期</button>
+      <button class="seg-btn" data-hmode="daily">每日檢視</button>
+      <button class="seg-btn" data-hmode="period">自訂時段</button>
+    </div>
+
+    <!-- Navigator for Cycle or Daily -->
+    <div class="nav-bar" id="home-nav-bar">
+      <button class="nav-arrow" id="nav-prev" aria-label="上一個">‹</button>
+      <div class="nav-center">
+        <div class="main num" id="nav-main-text">-</div>
+        <div class="sub num" id="nav-sub-text">-</div>
       </div>
-      <button class="cycle-btn" id="next-cycle" aria-label="下個週期">›</button>
+      <button class="nav-arrow" id="nav-next" aria-label="下一個">›</button>
     </div>
 
+    <!-- Custom Period Date Inputs -->
+    <div class="period-picker" id="home-period-picker" style="display:none">
+      <input type="date" id="period-start" />
+      <span class="muted">至</span>
+      <input type="date" id="period-end" />
+    </div>
+
+    <!-- Summary Card -->
     <div class="card">
-      <div class="summary-top">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
         <div>
-          <div class="muted">本週期總支出</div>
-          <div class="big-num" id="home-total">HK$0</div>
+          <div class="muted" id="summary-label">本週期總支出</div>
+          <div class="hero-amt num" id="home-total">HK$0</div>
         </div>
-        <div style="text-align:right">
-          <div class="muted">月度預算</div>
-          <div style="font-size:16px;font-weight:600" id="home-budget">HK$10,000</div>
-        </div>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="home-progress" style="width:0%;background:var(--blue)"></div>
-      </div>
-      <div class="stat-grid">
-        <div class="stat-box">
-          <div class="lbl">剩餘預算</div>
-          <div class="val" id="home-remain">HK$0</div>
-        </div>
-        <div class="stat-box">
-          <div class="lbl">每日可用餘額</div>
-          <div class="val" id="home-daily" style="color:var(--blue)">HK$0</div>
+        <div style="text-align:right" id="summary-right-box">
+          <div class="muted" id="summary-right-lbl">月度預算</div>
+          <div class="num" style="font-size:15px;font-weight:600;margin-top:4px" id="summary-right-val">HK$10,000</div>
         </div>
       </div>
+      <div class="progress-track" id="home-progress-wrap">
+        <div class="progress-fill" id="home-progress" style="width:0%"></div>
+      </div>
+      <div class="meta-grid" id="home-meta-grid"></div>
     </div>
 
+    <!-- Pie Chart Card -->
     <div class="card">
-      <div class="card-title">
-        <span>開支分類佔比</span>
-        <span class="muted" style="font-weight:400;font-size:12px">點擊色塊查看</span>
+      <div class="card-head">
+        <span class="card-title">分類佔比</span>
+        <span class="muted">點擊圓環查看</span>
       </div>
       <div class="pie-wrap" id="home-pie-area"></div>
     </div>
 
+    <!-- Transactions Grouped by Day -->
     <div class="card">
-      <div class="card-title">
-        <span>本週期明細</span>
-        <span class="muted" id="home-tx-count" style="font-weight:400;font-size:13px">0 筆</span>
+      <div class="card-head">
+        <span class="card-title">支出明細</span>
+        <span class="muted num" id="home-tx-count">0 筆</span>
       </div>
       <div id="home-tx-list"></div>
     </div>
@@ -345,63 +399,70 @@
   <div id="view-travel" class="view container">
     <div class="header">
       <h1>旅行銀包</h1>
-      <button class="btn btn-soft btn-sm" id="btn-new-trip">+ 新增旅程</button>
+      <button class="btn btn-sm" id="btn-new-trip">+ 新增旅程</button>
     </div>
 
-    <div class="card" id="trip-selector-card" style="padding:12px 14px">
+    <div class="card" style="padding:10px 12px">
       <div style="display:flex;gap:8px;align-items:center">
-        <select id="trip-select" style="flex:1"></select>
-        <button class="btn btn-red btn-sm" id="btn-del-trip" title="刪除旅程">刪除</button>
+        <select id="trip-select" style="flex:1;border:none;background:var(--surface-alt)"></select>
+        <button class="btn btn-sm btn-danger" id="btn-del-trip">刪除</button>
       </div>
     </div>
 
     <div id="travel-content"></div>
   </div>
 
-  <!-- VIEW 3: SETTINGS & FIXED EXPENSES -->
+  <!-- VIEW 3: SETTINGS -->
   <div id="view-settings" class="view container">
     <div class="header">
-      <h1>設定與工具</h1>
+      <h1>設定</h1>
     </div>
 
     <div class="card">
-      <div class="card-title">記帳週期與預算</div>
+      <div class="card-head"><span class="card-title">週期與預算</span></div>
       <div class="setting-row">
         <div>
           <label for="set-start-day">每月結算起始日</label>
           <small>例如設為 28：每月 28 號至下月 27 號</small>
         </div>
-        <select id="set-start-day" style="width:92px"></select>
+        <select id="set-start-day" style="width:96px"></select>
       </div>
       <div class="setting-row">
         <div>
           <label for="set-budget">每月預算 (HK$)</label>
-          <small>用於計算進度條及每日可用餘額</small>
+          <small>用於計算進度及每日可用餘額</small>
         </div>
-        <input type="number" id="set-budget" style="width:120px;text-align:right" inputmode="decimal" />
+        <input type="number" id="set-budget" style="width:116px;text-align:right" inputmode="decimal" />
       </div>
     </div>
 
     <div class="card">
-      <div class="card-title">
-        <span>固定開支範本</span>
-        <button class="btn btn-green btn-sm" id="btn-apply-fixed">本月一鍵入帳</button>
+      <div class="card-head">
+        <span class="card-title">固定開支範本</span>
+        <button class="btn btn-sm" id="btn-apply-fixed">一鍵入帳</button>
       </div>
       <div id="fixed-list"></div>
-      <div style="display:grid;grid-template-columns:1.2fr 0.9fr auto;gap:8px;margin-top:12px">
+      <div style="display:grid;grid-template-columns:1.2fr 0.9fr auto;gap:6px;margin-top:12px">
         <input type="text" id="new-fixed-name" placeholder="名稱 (如電話費)" />
         <input type="number" id="new-fixed-amt" placeholder="金額" inputmode="decimal" />
-        <button class="btn btn-soft btn-sm" id="btn-add-fixed">加入</button>
+        <button class="btn btn-sm" id="btn-add-fixed">加入</button>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-title">資料匯出與備份（純本機）</div>
-      <div style="display:grid;gap:10px">
-        <button class="btn btn-soft" id="btn-export-csv">匯出日常開支 CSV（Excel / Numbers）</button>
-        <button class="btn btn-soft" id="btn-backup-json">下載完整資料備份 (.json)</button>
-        <label class="btn btn-soft" style="cursor:pointer;margin:0">
-          還原備份檔案 (.json)
+      <div class="card-head"><span class="card-title">CSV 匯入與資料管理</span></div>
+      <div style="display:grid;gap:8px">
+        <label class="btn btn-dark" style="cursor:pointer;margin:0">
+          匯入 CSV 紀錄 (.csv)
+          <input type="file" id="input-import-csv" accept=".csv,text/csv" style="display:none" />
+        </label>
+        <div class="muted" style="line-height:1.5;padding:2px 2px 6px">
+          支援格式：<code>日期,分類,備註,金額</code>（如 <code>2026-11-22,餐飲,午餐,65</code>），可直接匯入本 App 匯出的 CSV 或自行用 Excel 整理的表格，資料會自動合併並儲存於本機。
+        </div>
+        <button class="btn" id="btn-export-csv">匯出日常開支 CSV</button>
+        <button class="btn" id="btn-backup-json">下載完整備份 (.json)</button>
+        <label class="btn" style="cursor:pointer;margin:0">
+          還原完整備份 (.json)
           <input type="file" id="input-restore-json" accept=".json" style="display:none" />
         </label>
       </div>
@@ -411,16 +472,16 @@
   <!-- BOTTOM TAB BAR -->
   <nav class="tabbar">
     <button class="tab-btn active" data-tab="home">
-      <span class="tab-icon">📊</span>
+      <svg viewBox="0 0 24 24"><path d="M21 12A9 9 0 1 1 12 3v9z"/><path d="M12 3a9 9 0 0 1 9 9h-9z"/></svg>
       <span>總覽</span>
     </button>
     <button class="add-fab" id="open-add" aria-label="記一筆">+</button>
     <button class="tab-btn" data-tab="travel">
-      <span class="tab-icon">✈️</span>
-      <span>旅行銀包</span>
+      <svg viewBox="0 0 24 24"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.2-1.1.7l-.3.8c-.2.5 0 1.1.4 1.4L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 2.9 5.2c.3.4.9.6 1.4.4l.8-.3c.5-.2.8-.6.7-1.1z"/></svg>
+      <span>旅行</span>
     </button>
     <button class="tab-btn" data-tab="settings">
-      <span class="tab-icon">⚙️</span>
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       <span>設定</span>
     </button>
   </nav>
@@ -430,11 +491,11 @@
     <div class="sheet">
       <div class="sheet-handle"></div>
       <div class="sheet-head">
-        <h2>快速記帳</h2>
+        <h2>記一筆</h2>
         <button class="close-btn" id="close-add">✕</button>
       </div>
 
-      <div class="seg-control">
+      <div class="seg seg-2">
         <button class="seg-btn active" data-mode="daily">日常銀包</button>
         <button class="seg-btn" data-mode="travel">旅行銀包</button>
       </div>
@@ -447,7 +508,7 @@
 
       <div class="amount-display">
         <span class="amount-curr" id="add-curr-label">HK$</span>
-        <span class="amount-expr" id="calc-display">0</span>
+        <span class="amount-expr num" id="calc-display">0</span>
       </div>
 
       <div class="cat-grid" id="add-cat-grid"></div>
@@ -516,42 +577,43 @@
           </div>
         </div>
         <div>
-          <label class="muted">旅程總預算 (港幣 HK$)</label>
-          <input type="number" id="nt-budget" placeholder="例如：12000" value="10000" inputmode="decimal" />
+          <label class="muted">旅程預算 (HK$)</label>
+          <input type="number" id="nt-budget" value="10000" inputmode="decimal" />
         </div>
-        <button class="btn btn-primary" id="save-new-trip" style="margin-top:6px">建立旅行銀包</button>
+        <button class="btn btn-dark" id="save-new-trip" style="margin-top:6px">建立旅程</button>
       </div>
     </div>
   </div>
 
   <script>
-    // Register Service Worker for 100% offline support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
       });
     }
 
+    // Keep same storage key so user's existing data is 100% preserved
     const STORAGE_KEY = 'wallet_buddy_offline_data_v1';
 
+    // Refined muted minimalist palette for categories
     const DAILY_CATS = [
-      { id: 'food', name: '餐飲', icon: '🍜', color: '#FF9500' },
-      { id: 'transport', name: '交通', icon: '🚇', color: '#007AFF' },
-      { id: 'shopping', name: '購物', icon: '🛍️', color: '#FF2D55' },
-      { id: 'daily', name: '日用', icon: '🧴', color: '#34C759' },
-      { id: 'fun', name: '娛樂', icon: '🎮', color: '#AF52DE' },
-      { id: 'bills', name: '固定帳單', icon: '🧾', color: '#5856D6' },
-      { id: 'health', name: '健身醫療', icon: '💪', color: '#00C7BE' },
-      { id: 'other', name: '其他', icon: '📦', color: '#8E8E93' }
+      { id: 'food', name: '餐飲', color: '#2C2C2E' },
+      { id: 'transport', name: '交通', color: '#5E7A8C' },
+      { id: 'shopping', name: '購物', color: '#B57B6B' },
+      { id: 'daily', name: '日用', color: '#6E8B74' },
+      { id: 'fun', name: '娛樂', color: '#8A7B9E' },
+      { id: 'bills', name: '固定帳單', color: '#A38F6D' },
+      { id: 'health', name: '健身醫療', color: '#5B8A8A' },
+      { id: 'other', name: '其他', color: '#AEAEB2' }
     ];
 
     const TRAVEL_CATS = [
-      { id: 't_food', name: '美食', icon: '🍣', color: '#FF9500' },
-      { id: 't_trans', name: '當地交通', icon: '🚅', color: '#007AFF' },
-      { id: 't_hotel', name: '機票酒店', icon: '🏨', color: '#5856D6' },
-      { id: 't_shop', name: '手信購物', icon: '🎁', color: '#FF2D55' },
-      { id: 't_ticket', name: '景點門票', icon: '🎟️', color: '#34C759' },
-      { id: 't_other', name: '其他旅費', icon: '🧳', color: '#8E8E93' }
+      { id: 't_food', name: '美食', color: '#2C2C2E' },
+      { id: 't_trans', name: '交通', color: '#5E7A8C' },
+      { id: 't_hotel', name: '機酒', color: '#A38F6D' },
+      { id: 't_shop', name: '購物', color: '#B57B6B' },
+      { id: 't_ticket', name: '門票', color: '#6E8B74' },
+      { id: 't_other', name: '其他', color: '#AEAEB2' }
     ];
 
     const PRESETS = [
@@ -559,7 +621,7 @@
       { label: '午餐 $65', amt: '65', cat: 'food', note: '午餐' },
       { label: '晚餐 $100', amt: '100', cat: 'food', note: '晚餐' },
       { label: '咖啡 $38', amt: '38', cat: 'food', note: '咖啡' },
-      { label: '搭車 $15', amt: '15', cat: 'transport', note: '交通' }
+      { label: '交通 $15', amt: '15', cat: 'transport', note: '交通' }
     ];
 
     function defaultData() {
@@ -581,8 +643,7 @@
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return defaultData();
-        const parsed = JSON.parse(raw);
-        return Object.assign(defaultData(), parsed);
+        return Object.assign(defaultData(), JSON.parse(raw));
       } catch {
         return defaultData();
       }
@@ -597,37 +658,29 @@
       el.textContent = msg;
       el.classList.add('show');
       clearTimeout(window._toastTimer);
-      window._toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+      window._toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
     }
 
     function fmtHKD(n) {
       return 'HK$' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 1 });
     }
 
-    function todayStr() {
-      const d = new Date();
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${y}-${m}-${day}`;
+    function dateToYMD(d) {
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     }
 
-    // Billing cycle calculator
-    let cycleOffset = 0; // 0 = current cycle
-    function getCycleRange(startDay, offset) {
-      const now = new Date();
-      const y = now.getFullYear();
-      const m = now.getMonth();
-      const d = now.getDate();
+    function todayStr() { return dateToYMD(new Date()); }
 
-      let baseYear = y;
-      let baseMonth = d >= startDay ? m : m - 1;
-      baseMonth += offset;
+    function shortDate(d) { return `${d.getMonth()+1}月${d.getDate()}日`; }
 
-      const start = makeClampedDate(baseYear, baseMonth, startDay);
-      const nextStart = makeClampedDate(baseYear, baseMonth + 1, startDay);
-      const end = new Date(nextStart.getTime() - 86400000);
-      return { start, end };
+    function parseYMD(str) {
+      const [y, m, d] = str.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function weekdayZh(ymd) {
+      const days = ['日', '一', '二', '三', '四', '五', '六'];
+      return '週' + days[parseYMD(ymd).getDay()];
     }
 
     function makeClampedDate(year, monthIndex, day) {
@@ -636,22 +689,42 @@
       return new Date(firstOfMonth.getFullYear(), firstOfMonth.getMonth(), Math.min(day, lastDay));
     }
 
-    function dateToYMD(d) {
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    function getCycleRange(startDay, offset) {
+      const now = new Date();
+      let baseMonth = now.getDate() >= startDay ? now.getMonth() : now.getMonth() - 1;
+      baseMonth += offset;
+      const start = makeClampedDate(now.getFullYear(), baseMonth, startDay);
+      const nextStart = makeClampedDate(now.getFullYear(), baseMonth + 1, startDay);
+      const end = new Date(nextStart.getTime() - 86400000);
+      return { start, end };
     }
 
-    function shortDate(d) {
-      return `${d.getMonth()+1}月${d.getDate()}日`;
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
 
-    // SVG Interactive Donut Chart Renderer
+    // Home view state
+    let homeMode = 'cycle'; // 'cycle' | 'daily' | 'period'
+    let cycleOffset = 0;
+    let dailyOffset = 0;
+    let selectedHomeCat = null;
+
+    // Init custom period defaults (last 7 days)
+    (() => {
+      const end = new Date();
+      const start = new Date(end.getTime() - 6 * 86400000);
+      document.getElementById('period-start').value = dateToYMD(start);
+      document.getElementById('period-end').value = dateToYMD(end);
+    })();
+
+    // Minimalist Donut Chart
     function renderPieSection(container, items, total, selectedCatId, onSelect) {
       if (!items.length || total <= 0) {
-        container.innerHTML = `<div class="empty">暫時未有支出紀錄，撳下方藍色「+」開始記第一筆！</div>`;
+        container.innerHTML = `<div class="empty">暫無支出紀錄</div>`;
         return;
       }
 
-      const radius = 78;
+      const radius = 76;
       const circumference = 2 * Math.PI * radius;
       let acc = 0;
       const activeItem = items.find(i => i.id === selectedCatId) || items[0];
@@ -659,20 +732,20 @@
       let circles = '';
       items.forEach(item => {
         const pct = item.amount / total;
-        const dash = pct * circumference;
+        const dash = Math.max(0, pct * circumference - 1.5);
         const gap = circumference - dash;
         const offset = -acc * circumference;
         acc += pct;
         const isSel = item.id === activeItem.id;
         circles += `
           <circle
-            cx="105" cy="105" r="${radius}"
+            cx="98" cy="98" r="${radius}"
             fill="transparent"
             stroke="${item.color}"
-            stroke-width="${isSel ? 28 : 22}"
+            stroke-width="${isSel ? 20 : 14}"
             stroke-dasharray="${dash} ${gap}"
             stroke-dashoffset="${offset}"
-            style="cursor:pointer;transition:stroke-width 0.2s"
+            style="cursor:pointer;transition:stroke-width 0.18s"
             data-cat="${item.id}"
           />
         `;
@@ -680,33 +753,32 @@
 
       const activePct = ((activeItem.amount / total) * 100).toFixed(1);
 
-      let rows = items.map(item => {
+      const rows = items.map(item => {
         const pct = ((item.amount / total) * 100).toFixed(1);
         const isSel = item.id === activeItem.id;
         return `
           <div class="cat-row ${isSel ? 'active' : ''}" data-cat="${item.id}">
             <div class="cat-left">
               <span class="cat-dot" style="background:${item.color}"></span>
-              <span class="cat-icon">${item.icon}</span>
               <span class="cat-name">${item.name}</span>
             </div>
-            <div class="cat-right">
-              <div class="cat-amt">${fmtHKD(item.amount)}</div>
-              <div class="cat-pct">${pct}%</div>
+            <div class="cat-right num">
+              <span class="cat-amt">${fmtHKD(item.amount)}</span>
+              <span class="cat-pct">${pct}%</span>
             </div>
           </div>
         `;
       }).join('');
 
       container.innerHTML = `
-        <div class="pie-svg-box">
-          <svg viewBox="0 0 210 210" width="210" height="210" style="transform:rotate(-90deg)">
+        <div class="pie-box">
+          <svg viewBox="0 0 196 196" width="196" height="196" style="transform:rotate(-90deg)">
             ${circles}
           </svg>
           <div class="pie-center">
-            <div class="c-name">${activeItem.icon} ${activeItem.name}</div>
-            <div class="c-pct" style="color:${activeItem.color}">${activePct}%</div>
-            <div class="c-amt">${fmtHKD(activeItem.amount)}</div>
+            <div class="c-name">${activeItem.name}</div>
+            <div class="c-pct num">${activePct}%</div>
+            <div class="c-amt num">${fmtHKD(activeItem.amount)}</div>
           </div>
         </div>
         <div class="cat-list">${rows}</div>
@@ -717,56 +789,155 @@
       });
     }
 
-    // Render Home
-    let selectedHomeCat = null;
     function renderHome() {
-      const { start, end } = getCycleRange(state.settings.startDay, cycleOffset);
-      const startStr = dateToYMD(start);
-      const endStr = dateToYMD(end);
+      const navBar = document.getElementById('home-nav-bar');
+      const periodPicker = document.getElementById('home-period-picker');
+      const progWrap = document.getElementById('home-progress-wrap');
+      const rightBox = document.getElementById('summary-right-box');
+      const metaGrid = document.getElementById('home-meta-grid');
 
-      document.getElementById('cycle-range-text').textContent =
-        `${start.getFullYear()}年 ${shortDate(start)} – ${shortDate(end)}`;
+      let startStr, endStr, daysCount = 1;
 
-      const now = new Date();
-      const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      let daysLeftText = '';
-      let daysForDaily = 1;
-      if (todayMid < start) {
-        daysLeftText = '未來週期';
-        daysForDaily = Math.max(1, Math.round((end - start) / 86400000) + 1);
-      } else if (todayMid > end) {
-        daysLeftText = '已結束週期';
-        daysForDaily = 1;
+      if (homeMode === 'cycle') {
+        navBar.style.display = 'flex';
+        periodPicker.style.display = 'none';
+        progWrap.style.display = 'block';
+        rightBox.style.display = 'block';
+
+        const { start, end } = getCycleRange(state.settings.startDay, cycleOffset);
+        startStr = dateToYMD(start);
+        endStr = dateToYMD(end);
+        daysCount = Math.max(1, Math.round((end - start) / 86400000) + 1);
+
+        document.getElementById('nav-main-text').textContent = `${start.getFullYear()}年 ${shortDate(start)} – ${shortDate(end)}`;
+        const now = new Date();
+        const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        let daysLeftText = '';
+        let daysForDaily = 1;
+        if (todayMid < start) {
+          daysLeftText = '未來週期';
+          daysForDaily = daysCount;
+        } else if (todayMid > end) {
+          daysLeftText = '已結束週期';
+          daysForDaily = 1;
+        } else {
+          const left = Math.round((end - todayMid) / 86400000) + 1;
+          daysLeftText = `距離結算尚餘 ${left} 日`;
+          daysForDaily = Math.max(1, left);
+        }
+        document.getElementById('nav-sub-text').textContent = daysLeftText;
+        document.getElementById('summary-label').textContent = '本週期總支出';
+
+        const txs = getFilteredDailyTxs(startStr, endStr);
+        const total = txs.reduce((s, t) => s + Number(t.amount), 0);
+        const budget = Number(state.settings.monthlyBudget || 0);
+        const remain = budget - total;
+        const pct = budget > 0 ? Math.min(100, (total / budget) * 100) : 0;
+
+        document.getElementById('home-total').textContent = fmtHKD(total);
+        document.getElementById('summary-right-lbl').textContent = '月度預算';
+        document.getElementById('summary-right-val').textContent = fmtHKD(budget);
+        const prog = document.getElementById('home-progress');
+        prog.style.width = pct + '%';
+        prog.style.background = pct >= 100 ? 'var(--danger)' : 'var(--ink)';
+
+        const dailyAllow = remain > 0 ? remain / daysForDaily : 0;
+        metaGrid.innerHTML = `
+          <div class="meta-item">
+            <div class="lbl">剩餘預算</div>
+            <div class="val num" style="color:${remain < 0 ? 'var(--danger)' : 'var(--ink)'}">
+              ${remain < 0 ? '-' : ''}${fmtHKD(Math.abs(remain))}
+            </div>
+          </div>
+          <div class="meta-item">
+            <div class="lbl">每日可用餘額</div>
+            <div class="val num">${fmtHKD(dailyAllow)}</div>
+          </div>
+        `;
+        renderHomeBottom(txs, total, true);
+
+      } else if (homeMode === 'daily') {
+        navBar.style.display = 'flex';
+        periodPicker.style.display = 'none';
+        progWrap.style.display = 'none';
+        rightBox.style.display = 'block';
+
+        const target = new Date();
+        target.setDate(target.getDate() + dailyOffset);
+        startStr = endStr = dateToYMD(target);
+
+        const isToday = dailyOffset === 0;
+        document.getElementById('nav-main-text').textContent = `${startStr} (${weekdayZh(startStr)})`;
+        document.getElementById('nav-sub-text').textContent = isToday ? '今日' : (dailyOffset === -1 ? '昨日' : '');
+        document.getElementById('summary-label').textContent = '當日總支出';
+
+        const txs = getFilteredDailyTxs(startStr, endStr);
+        const total = txs.reduce((s, t) => s + Number(t.amount), 0);
+
+        document.getElementById('home-total').textContent = fmtHKD(total);
+        document.getElementById('summary-right-lbl').textContent = '交易筆數';
+        document.getElementById('summary-right-val').textContent = `${txs.length} 筆`;
+
+        // Compare with daily average budget
+        const dailyTarget = Number(state.settings.monthlyBudget || 0) / 30;
+        const diff = dailyTarget - total;
+        metaGrid.innerHTML = `
+          <div class="meta-item">
+            <div class="lbl">日均預算參考</div>
+            <div class="val num">${fmtHKD(dailyTarget)}</div>
+          </div>
+          <div class="meta-item">
+            <div class="lbl">與日均差額</div>
+            <div class="val num" style="color:${diff < 0 ? 'var(--danger)' : 'var(--ok)'}">
+              ${diff >= 0 ? '慳 ' : '超 '}${fmtHKD(Math.abs(diff))}
+            </div>
+          </div>
+        `;
+        renderHomeBottom(txs, total, false);
+
       } else {
-        const left = Math.round((end - todayMid) / 86400000) + 1;
-        daysLeftText = `距離下期結算尚餘 ${left} 日`;
-        daysForDaily = Math.max(1, left);
+        // Custom Period
+        navBar.style.display = 'none';
+        periodPicker.style.display = 'grid';
+        progWrap.style.display = 'none';
+        rightBox.style.display = 'block';
+
+        let s = document.getElementById('period-start').value || todayStr();
+        let e = document.getElementById('period-end').value || todayStr();
+        if (s > e) { [s, e] = [e, s]; }
+        startStr = s; endStr = e;
+        daysCount = Math.max(1, Math.round((parseYMD(e) - parseYMD(s)) / 86400000) + 1);
+
+        document.getElementById('summary-label').textContent = `時段總支出（共 ${daysCount} 日）`;
+        const txs = getFilteredDailyTxs(startStr, endStr);
+        const total = txs.reduce((s, t) => s + Number(t.amount), 0);
+
+        document.getElementById('home-total').textContent = fmtHKD(total);
+        document.getElementById('summary-right-lbl').textContent = '交易筆數';
+        document.getElementById('summary-right-val').textContent = `${txs.length} 筆`;
+
+        const activeDays = new Set(txs.map(t => t.date)).size;
+        metaGrid.innerHTML = `
+          <div class="meta-item">
+            <div class="lbl">平均每日支出</div>
+            <div class="val num">${fmtHKD(total / daysCount)}</div>
+          </div>
+          <div class="meta-item">
+            <div class="lbl">有消費日數</div>
+            <div class="val num">${activeDays} / ${daysCount} 日</div>
+          </div>
+        `;
+        renderHomeBottom(txs, total, true);
       }
-      document.getElementById('cycle-days-left').textContent = daysLeftText;
+    }
 
-      const txs = state.transactions
+    function getFilteredDailyTxs(startStr, endStr) {
+      return state.transactions
         .filter(t => t.date >= startStr && t.date <= endStr)
-        .sort((a, b) => (b.date.localeCompare(a.date)) || (b.createdAt - a.createdAt));
+        .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+    }
 
-      const total = txs.reduce((s, t) => s + Number(t.amount), 0);
-      const budget = Number(state.settings.monthlyBudget || 0);
-      const remain = budget - total;
-      const pct = budget > 0 ? Math.min(100, (total / budget) * 100) : 0;
-
-      document.getElementById('home-total').textContent = fmtHKD(total);
-      document.getElementById('home-budget').textContent = fmtHKD(budget);
-      const prog = document.getElementById('home-progress');
-      prog.style.width = pct + '%';
-      prog.style.background = pct >= 100 ? 'var(--red)' : (pct >= 80 ? 'var(--orange)' : 'var(--blue)');
-
-      const remainEl = document.getElementById('home-remain');
-      remainEl.textContent = (remain < 0 ? '-' : '') + fmtHKD(Math.abs(remain));
-      remainEl.style.color = remain < 0 ? 'var(--red)' : 'var(--text)';
-
-      const daily = remain > 0 ? remain / daysForDaily : 0;
-      document.getElementById('home-daily').textContent = fmtHKD(daily);
-
-      // Group by category
+    function renderHomeBottom(txs, total, groupByDay) {
       const map = {};
       txs.forEach(t => { map[t.category] = (map[t.category] || 0) + Number(t.amount); });
       const pieItems = DAILY_CATS
@@ -782,37 +953,62 @@
       document.getElementById('home-tx-count').textContent = `${txs.length} 筆`;
       const listEl = document.getElementById('home-tx-list');
       if (!txs.length) {
-        listEl.innerHTML = `<div class="empty">呢個週期暫時未有紀錄</div>`;
+        listEl.innerHTML = `<div class="empty">此時段暫無支出紀錄</div>`;
+        return;
+      }
+
+      if (!groupByDay) {
+        listEl.innerHTML = txs.map(renderTxRow).join('');
       } else {
-        listEl.innerHTML = txs.map(t => {
-          const cat = DAILY_CATS.find(c => c.id === t.category) || DAILY_CATS[DAILY_CATS.length - 1];
+        // Group by date with daily subtotals so user sees daily spending at a glance
+        const groups = {};
+        txs.forEach(t => {
+          if (!groups[t.date]) groups[t.date] = [];
+          groups[t.date].push(t);
+        });
+        const dates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+        listEl.innerHTML = dates.map(d => {
+          const daySum = groups[d].reduce((s, t) => s + Number(t.amount), 0);
           return `
-            <div class="tx-item">
-              <div class="tx-left">
-                <div class="tx-badge" style="background:${cat.color}20">${cat.icon}</div>
-                <div class="tx-info">
-                  <div class="tx-note">${escapeHtml(t.note || cat.name)}</div>
-                  <div class="tx-meta">${t.date} · ${cat.name}</div>
-                </div>
+            <div class="day-group">
+              <div class="day-header">
+                <span>${d} · ${weekdayZh(d)}</span>
+                <span class="day-sum num">${fmtHKD(daySum)}</span>
               </div>
-              <div class="tx-right">
-                <div class="tx-price">${fmtHKD(t.amount)}</div>
-                <button class="del-btn" onclick="deleteDailyTx('${t.id}')">✕</button>
-              </div>
+              ${groups[d].map(renderTxRow).join('')}
             </div>
           `;
         }).join('');
       }
     }
 
+    function renderTxRow(t) {
+      const cat = DAILY_CATS.find(c => c.id === t.category) || DAILY_CATS[DAILY_CATS.length - 1];
+      return `
+        <div class="tx-item">
+          <div class="tx-left">
+            <span class="tx-dot" style="background:${cat.color}"></span>
+            <div class="tx-info">
+              <div class="tx-note">${escapeHtml(t.note || cat.name)}</div>
+              <div class="tx-meta">${cat.name}</div>
+            </div>
+          </div>
+          <div class="tx-right">
+            <div class="tx-price num">${fmtHKD(t.amount)}</div>
+            <button class="icon-del" onclick="deleteDailyTx('${t.id}')" aria-label="刪除">✕</button>
+          </div>
+        </div>
+      `;
+    }
+
     window.deleteDailyTx = function(id) {
       state.transactions = state.transactions.filter(t => t.id !== id);
       saveState();
       renderHome();
-      showToast('已刪除紀錄');
+      showToast('已刪除');
     };
 
-    // Render Travel
+    // Travel View
     let selectedTravelCat = null;
     function renderTravel() {
       const sel = document.getElementById('trip-select');
@@ -822,14 +1018,12 @@
       if (!state.trips.length) {
         sel.innerHTML = `<option>未有旅程</option>`;
         delBtn.style.display = 'none';
-        content.innerHTML = `<div class="card"><div class="empty">撳右上角「+ 新增旅程」建立你嘅獨立旅行銀包，完全唔會影響日常預算！</div></div>`;
+        content.innerHTML = `<div class="card"><div class="empty">撳右上角「+ 新增旅程」建立獨立旅行銀包</div></div>`;
         return;
       }
 
       delBtn.style.display = 'inline-flex';
-      if (!state.trips.some(t => t.id === state.activeTripId)) {
-        state.activeTripId = state.trips[0].id;
-      }
+      if (!state.trips.some(t => t.id === state.activeTripId)) state.activeTripId = state.trips[0].id;
       sel.innerHTML = state.trips.map(t =>
         `<option value="${t.id}" ${t.id === state.activeTripId ? 'selected' : ''}>${escapeHtml(t.name)} (${t.currency})</option>`
       ).join('');
@@ -843,61 +1037,59 @@
 
       content.innerHTML = `
         <div class="card">
-          <div class="summary-top">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
             <div>
-              <div class="muted">旅程總開支（折合港幣）</div>
-              <div class="big-num">${fmtHKD(totalHKD)}</div>
-              <div class="muted" style="margin-top:2px">當地總計：${trip.currency} ${totalLocal.toLocaleString('en-US', {maximumFractionDigits:1})}（匯率 ${trip.rate}）</div>
+              <div class="muted">旅程總支出（折合港幣）</div>
+              <div class="hero-amt num">${fmtHKD(totalHKD)}</div>
+              <div class="muted num" style="margin-top:4px">${trip.currency} ${totalLocal.toLocaleString('en-US', {maximumFractionDigits:1})} · 匯率 ${trip.rate}</div>
             </div>
             <div style="text-align:right">
-              <div class="muted">旅程預算</div>
-              <div style="font-size:16px;font-weight:600">${fmtHKD(trip.budgetHKD)}</div>
+              <div class="muted">預算</div>
+              <div class="num" style="font-size:15px;font-weight:600;margin-top:4px">${fmtHKD(trip.budgetHKD)}</div>
             </div>
           </div>
           <div class="progress-track">
-            <div class="progress-fill" style="width:${pct}%;background:${pct >= 100 ? 'var(--red)' : 'var(--purple)'}"></div>
+            <div class="progress-fill" style="width:${pct}%;background:${pct >= 100 ? 'var(--danger)' : 'var(--ink)'}"></div>
           </div>
-          <div style="display:flex;justify-content:space-between;font-size:13px">
-            <span class="muted">已用 ${pct.toFixed(1)}%</span>
-            <span style="font-weight:600;color:${remainHKD < 0 ? 'var(--red)' : 'var(--green)'}">
+          <div style="display:flex;justify-content:space-between;font-size:12px">
+            <span class="muted num">已用 ${pct.toFixed(1)}%</span>
+            <span class="num" style="font-weight:600;color:${remainHKD < 0 ? 'var(--danger)' : 'var(--ok)'}">
               ${remainHKD < 0 ? '超支 ' : '剩餘 '}${fmtHKD(Math.abs(remainHKD))}
             </span>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-title"><span>旅費分類佔比</span></div>
+          <div class="card-head"><span class="card-title">旅費佔比</span></div>
           <div class="pie-wrap" id="travel-pie-area"></div>
         </div>
 
         <div class="card">
-          <div class="card-title">
-            <span>旅費明細</span>
-            <span class="muted" style="font-weight:400;font-size:13px">${exps.length} 筆</span>
+          <div class="card-head">
+            <span class="card-title">旅費明細</span>
+            <span class="muted num">${exps.length} 筆</span>
           </div>
-          <div id="travel-tx-list">
-            ${!exps.length ? '<div class="empty">撳下方「+」並切換到「旅行銀包」即可用外幣記帳</div>' : exps.map(e => {
-              const cat = TRAVEL_CATS.find(c => c.id === e.category) || TRAVEL_CATS[TRAVEL_CATS.length - 1];
-              return `
-                <div class="tx-item">
-                  <div class="tx-left">
-                    <div class="tx-badge" style="background:${cat.color}20">${cat.icon}</div>
-                    <div class="tx-info">
-                      <div class="tx-note">${escapeHtml(e.note || cat.name)}</div>
-                      <div class="tx-meta">${e.date} · ${cat.name}</div>
-                    </div>
-                  </div>
-                  <div class="tx-right">
-                    <div>
-                      <div class="tx-price">${trip.currency} ${Number(e.localAmount).toLocaleString()}</div>
-                      <div class="tx-subprice">≈ ${fmtHKD(e.hkdAmount)}</div>
-                    </div>
-                    <button class="del-btn" onclick="deleteTravelTx('${trip.id}','${e.id}')">✕</button>
+          ${!exps.length ? '<div class="empty">撳下方「+」並切換到「旅行銀包」記帳</div>' : exps.map(e => {
+            const cat = TRAVEL_CATS.find(c => c.id === e.category) || TRAVEL_CATS[TRAVEL_CATS.length - 1];
+            return `
+              <div class="tx-item">
+                <div class="tx-left">
+                  <span class="tx-dot" style="background:${cat.color}"></span>
+                  <div class="tx-info">
+                    <div class="tx-note">${escapeHtml(e.note || cat.name)}</div>
+                    <div class="tx-meta">${e.date} · ${cat.name}</div>
                   </div>
                 </div>
-              `;
-            }).join('')}
-          </div>
+                <div class="tx-right">
+                  <div class="num">
+                    <div class="tx-price">${trip.currency} ${Number(e.localAmount).toLocaleString()}</div>
+                    <div class="tx-subprice">≈ ${fmtHKD(e.hkdAmount)}</div>
+                  </div>
+                  <button class="icon-del" onclick="deleteTravelTx('${trip.id}','${e.id}')">✕</button>
+                </div>
+              </div>
+            `;
+          }).join('')}
         </div>
       `;
 
@@ -920,10 +1112,10 @@
       trip.expenses = trip.expenses.filter(e => e.id !== expId);
       saveState();
       renderTravel();
-      showToast('已刪除旅費紀錄');
+      showToast('已刪除');
     };
 
-    // Render Settings
+    // Settings View
     function renderSettings() {
       const daySel = document.getElementById('set-start-day');
       if (!daySel.options.length) {
@@ -939,19 +1131,17 @@
 
       const fixedEl = document.getElementById('fixed-list');
       if (!state.fixedItems.length) {
-        fixedEl.innerHTML = `<div class="empty" style="padding:12px">未有固定開支範本</div>`;
+        fixedEl.innerHTML = `<div class="empty" style="padding:10px">暫無固定開支</div>`;
       } else {
         fixedEl.innerHTML = state.fixedItems.map(f => `
           <div class="tx-item">
             <div class="tx-left">
-              <div class="tx-badge" style="background:#5856D620">🧾</div>
-              <div class="tx-info">
-                <div class="tx-note">${escapeHtml(f.name)}</div>
-              </div>
+              <span class="tx-dot" style="background:#A38F6D"></span>
+              <div class="tx-note">${escapeHtml(f.name)}</div>
             </div>
             <div class="tx-right">
-              <div class="tx-price">${fmtHKD(f.amount)}</div>
-              <button class="del-btn" onclick="deleteFixed('${f.id}')">✕</button>
+              <div class="tx-price num">${fmtHKD(f.amount)}</div>
+              <button class="icon-del" onclick="deleteFixed('${f.id}')">✕</button>
             </div>
           </div>
         `).join('');
@@ -964,11 +1154,139 @@
       renderSettings();
     };
 
-    function escapeHtml(s) {
-      return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    // CSV Parser & Importer
+    function parseCSVLine(line) {
+      const res = [];
+      let cur = '', inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inQuotes) {
+          if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
+          else if (ch === '"') { inQuotes = false; }
+          else { cur += ch; }
+        } else {
+          if (ch === '"') inQuotes = true;
+          else if (ch === ',') { res.push(cur.trim()); cur = ''; }
+          else cur += ch;
+        }
+      }
+      res.push(cur.trim());
+      return res;
     }
 
-    // Navigation
+    function normalizeDate(raw) {
+      if (!raw) return null;
+      const cleaned = raw.replace(/\//g, '-').trim();
+      const m = cleaned.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+      if (!m) return null;
+      return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+    }
+
+    function mapCategory(rawCat) {
+      if (!rawCat) return 'other';
+      const s = rawCat.trim().toLowerCase();
+      const byId = DAILY_CATS.find(c => c.id === s);
+      if (byId) return byId.id;
+      const byName = DAILY_CATS.find(c => c.name === rawCat.trim());
+      if (byName) return byName.id;
+      if (s.includes('餐') || s.includes('食') || s.includes('food')) return 'food';
+      if (s.includes('交') || s.includes('車') || s.includes('trans')) return 'transport';
+      if (s.includes('購') || s.includes('買') || s.includes('shop')) return 'shopping';
+      if (s.includes('日用') || s.includes('超市')) return 'daily';
+      if (s.includes('娛') || s.includes('玩')) return 'fun';
+      if (s.includes('帳單') || s.includes('固定') || s.includes('bill')) return 'bills';
+      if (s.includes('健') || s.includes('醫')) return 'health';
+      return 'other';
+    }
+
+    document.getElementById('input-import-csv').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const text = String(reader.result || '').replace(/^\uFEFF/, '');
+          const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+          if (!lines.length) throw new Error();
+
+          let imported = 0;
+          const now = Date.now();
+          lines.forEach((line, idx) => {
+            const cols = parseCSVLine(line);
+            if (cols.length < 2) return;
+            // Skip header row
+            if (idx === 0 && (cols[0].includes('日期') || cols[0].toLowerCase().includes('date'))) return;
+
+            const date = normalizeDate(cols[0]);
+            if (!date) return;
+
+            let category = 'other', note = '', amount = 0;
+            if (cols.length >= 4) {
+              category = mapCategory(cols[1]);
+              note = cols[2];
+              amount = parseFloat(String(cols[3]).replace(/[^0-9.\-]/g, ''));
+            } else if (cols.length === 3) {
+              category = mapCategory(cols[1]);
+              amount = parseFloat(String(cols[2]).replace(/[^0-9.\-]/g, ''));
+            } else {
+              amount = parseFloat(String(cols[1]).replace(/[^0-9.\-]/g, ''));
+            }
+
+            if (amount > 0) {
+              state.transactions.push({
+                id: `csv_${now}_${idx}`,
+                amount: Math.round(amount * 100) / 100,
+                category,
+                note,
+                date,
+                createdAt: now + idx
+              });
+              imported++;
+            }
+          });
+
+          if (imported > 0) {
+            saveState();
+            renderHome();
+            showToast(`成功匯入 ${imported} 筆 CSV 紀錄`);
+          } else {
+            showToast('未能讀取有效紀錄，請檢查 CSV 格式');
+          }
+        } catch {
+          showToast('匯入失敗，請確認檔案為 UTF-8 CSV');
+        }
+      };
+      reader.readAsText(file, 'UTF-8');
+      e.target.value = '';
+    });
+
+    // Event Listeners
+    document.querySelectorAll('#home-mode-seg .seg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        homeMode = btn.getAttribute('data-hmode');
+        selectedHomeCat = null;
+        document.querySelectorAll('#home-mode-seg .seg-btn').forEach(b => b.classList.toggle('active', b === btn));
+        renderHome();
+      });
+    });
+
+    document.getElementById('nav-prev').addEventListener('click', () => {
+      if (homeMode === 'cycle') cycleOffset--;
+      else if (homeMode === 'daily') dailyOffset--;
+      selectedHomeCat = null;
+      renderHome();
+    });
+
+    document.getElementById('nav-next').addEventListener('click', () => {
+      if (homeMode === 'cycle') cycleOffset++;
+      else if (homeMode === 'daily') dailyOffset++;
+      selectedHomeCat = null;
+      renderHome();
+    });
+
+    document.getElementById('period-start').addEventListener('change', renderHome);
+    document.getElementById('period-end').addEventListener('change', renderHome);
+
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const tab = btn.getAttribute('data-tab');
@@ -980,9 +1298,6 @@
         if (tab === 'settings') renderSettings();
       });
     });
-
-    document.getElementById('prev-cycle').addEventListener('click', () => { cycleOffset--; renderHome(); });
-    document.getElementById('next-cycle').addEventListener('click', () => { cycleOffset++; renderHome(); });
 
     document.getElementById('set-start-day').addEventListener('change', (e) => {
       state.settings.startDay = Number(e.target.value);
@@ -996,7 +1311,7 @@
       if (val >= 0) {
         state.settings.monthlyBudget = val;
         saveState();
-        showToast('已更新每月預算');
+        showToast('已更新預算');
       }
     });
 
@@ -1009,7 +1324,7 @@
       document.getElementById('new-fixed-amt').value = '';
       saveState();
       renderSettings();
-      showToast('已加入固定開支範本');
+      showToast('已加入固定開支');
     });
 
     document.getElementById('btn-apply-fixed').addEventListener('click', () => {
@@ -1026,10 +1341,9 @@
         });
       });
       saveState();
-      showToast(`已一鍵入帳 ${state.fixedItems.length} 筆固定開支`);
+      showToast(`已入帳 ${state.fixedItems.length} 筆固定開支`);
     });
 
-    // CSV Export & JSON Backup/Restore
     document.getElementById('btn-export-csv').addEventListener('click', () => {
       const rows = [['日期', '分類', '備註', '金額(HKD)']];
       state.transactions.forEach(t => {
@@ -1056,9 +1370,9 @@
           saveState();
           renderHome();
           renderSettings();
-          showToast('資料已成功還原！');
+          showToast('備份已還原');
         } catch {
-          showToast('備份檔案格式不正確');
+          showToast('備份格式不正確');
         }
       };
       reader.readAsText(file);
@@ -1074,7 +1388,7 @@
       setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
     }
 
-    // Travel Modal & Selector
+    // Travel controls
     document.getElementById('trip-select').addEventListener('change', (e) => {
       state.activeTripId = e.target.value;
       selectedTravelCat = null;
@@ -1083,20 +1397,19 @@
     });
 
     document.getElementById('btn-del-trip').addEventListener('click', () => {
-      if (!confirm('確定刪除此旅行銀包及入面所有旅費紀錄？')) return;
+      if (!confirm('確定刪除此旅行銀包及所有紀錄？')) return;
       state.trips = state.trips.filter(t => t.id !== state.activeTripId);
       state.activeTripId = state.trips[0]?.id || null;
       saveState();
       renderTravel();
-      showToast('已刪除旅行銀包');
+      showToast('已刪除旅程');
     });
 
     const tripModal = document.getElementById('trip-modal');
     document.getElementById('btn-new-trip').addEventListener('click', () => tripModal.classList.add('open'));
     document.getElementById('close-trip').addEventListener('click', () => tripModal.classList.remove('open'));
     document.getElementById('nt-curr').addEventListener('change', (e) => {
-      const rate = e.target.selectedOptions[0].getAttribute('data-rate');
-      document.getElementById('nt-rate').value = rate;
+      document.getElementById('nt-rate').value = e.target.selectedOptions[0].getAttribute('data-rate');
     });
 
     document.getElementById('save-new-trip').addEventListener('click', () => {
@@ -1112,33 +1425,33 @@
       document.getElementById('nt-name').value = '';
       tripModal.classList.remove('open');
       renderTravel();
-      showToast(`已建立「${name}」旅行銀包`);
+      showToast(`已建立「${name}」`);
     });
 
-    // Quick Add Sheet Logic
+    // Quick Add Sheet
     const addModal = document.getElementById('add-modal');
-    let addMode = 'daily';
-    let addCat = 'food';
-    let calcExpr = '0';
+    let addMode = 'daily', addCat = 'food', calcExpr = '0';
 
     function openAddSheet() {
       calcExpr = '0';
       document.getElementById('calc-display').textContent = '0';
       document.getElementById('add-note').value = '';
-      document.getElementById('add-date').value = todayStr();
-      // Default to travel mode if currently viewing travel tab and trips exist
+      // If in daily view, default date to the currently viewed day
+      if (homeMode === 'daily') {
+        const d = new Date(); d.setDate(d.getDate() + dailyOffset);
+        document.getElementById('add-date').value = dateToYMD(d);
+      } else {
+        document.getElementById('add-date').value = todayStr();
+      }
       const onTravel = document.getElementById('view-travel').classList.contains('active') && state.trips.length > 0;
       setAddMode(onTravel ? 'travel' : 'daily');
       addModal.classList.add('open');
     }
 
     function setAddMode(mode) {
-      if (mode === 'travel' && !state.trips.length) {
-        showToast('請先喺「旅行銀包」新增一個旅程');
-        return;
-      }
+      if (mode === 'travel' && !state.trips.length) return showToast('請先喺「旅行」新增旅程');
       addMode = mode;
-      document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-mode') === mode));
+      document.querySelectorAll('#add-modal .seg-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-mode') === mode));
       const tripPicker = document.getElementById('add-trip-picker');
       const presetBar = document.getElementById('preset-bar');
       if (mode === 'travel') {
@@ -1160,11 +1473,9 @@
     }
 
     function updateAddCurrencyLabel() {
-      const tid = document.getElementById('add-trip-select').value;
-      const trip = state.trips.find(t => t.id === tid);
+      const trip = state.trips.find(t => t.id === document.getElementById('add-trip-select').value);
       document.getElementById('add-curr-label').textContent = trip ? trip.currency : 'HK$';
     }
-
     document.getElementById('add-trip-select').addEventListener('change', updateAddCurrencyLabel);
 
     function renderAddCategories() {
@@ -1172,66 +1483,50 @@
       const grid = document.getElementById('add-cat-grid');
       grid.innerHTML = cats.map(c => `
         <button class="cat-pill ${c.id === addCat ? 'active' : ''}" data-cid="${c.id}">
-          <span class="e">${c.icon}</span>${c.name}
+          <span class="d" style="background:${c.id === addCat ? '#FFFFFF' : c.color}"></span>
+          <span>${c.name}</span>
         </button>
       `).join('');
       grid.querySelectorAll('.cat-pill').forEach(p => {
-        p.addEventListener('click', () => {
-          addCat = p.getAttribute('data-cid');
-          renderAddCategories();
-        });
+        p.addEventListener('click', () => { addCat = p.getAttribute('data-cid'); renderAddCategories(); });
       });
     }
 
-    // Presets
     document.getElementById('preset-bar').innerHTML = PRESETS.map((p, i) =>
       `<button class="preset-chip" data-pi="${i}">${p.label}</button>`
     ).join('');
     document.querySelectorAll('.preset-chip').forEach(btn => {
       btn.addEventListener('click', () => {
         const p = PRESETS[Number(btn.getAttribute('data-pi'))];
-        calcExpr = p.amt;
-        addCat = p.cat;
+        calcExpr = p.amt; addCat = p.cat;
         document.getElementById('calc-display').textContent = calcExpr;
         document.getElementById('add-note').value = p.note;
         renderAddCategories();
       });
     });
 
-    document.querySelectorAll('.seg-btn').forEach(b => {
+    document.querySelectorAll('#add-modal .seg-btn').forEach(b => {
       b.addEventListener('click', () => setAddMode(b.getAttribute('data-mode')));
     });
 
     document.getElementById('open-add').addEventListener('click', openAddSheet);
     document.getElementById('close-add').addEventListener('click', () => addModal.classList.remove('open'));
 
-    // Safe +/- expression evaluator
     function evalExpr(expr) {
       const cleaned = expr.replace(/[^0-9.+\-]/g, '');
-      if (!cleaned) return 0;
       const tokens = cleaned.match(/[+\-]?[0-9.]+/g);
-      if (!tokens) return 0;
-      return tokens.reduce((sum, tok) => sum + (parseFloat(tok) || 0), 0);
+      return tokens ? tokens.reduce((s, tok) => s + (parseFloat(tok) || 0), 0) : 0;
     }
 
     document.querySelectorAll('.key').forEach(k => {
       k.addEventListener('click', () => {
         const val = k.getAttribute('data-k');
-        if (val === 'C') {
-          calcExpr = '0';
-        } else if (val === 'DEL') {
-          calcExpr = calcExpr.length > 1 ? calcExpr.slice(0, -1) : '0';
-        } else if (val === 'SAVE') {
-          saveNewExpense();
-          return;
-        } else if (val === '+' || val === '-') {
-          if (!/[+\-.]$/.test(calcExpr)) calcExpr += val;
-        } else if (val === '.') {
-          const lastNum = calcExpr.split(/[+\-]/).pop();
-          if (!lastNum.includes('.')) calcExpr += '.';
-        } else {
-          calcExpr = calcExpr === '0' ? val : calcExpr + val;
-        }
+        if (val === 'C') calcExpr = '0';
+        else if (val === 'DEL') calcExpr = calcExpr.length > 1 ? calcExpr.slice(0, -1) : '0';
+        else if (val === 'SAVE') return saveNewExpense();
+        else if (val === '+' || val === '-') { if (!/[+\-.]$/.test(calcExpr)) calcExpr += val; }
+        else if (val === '.') { if (!calcExpr.split(/[+\-]/).pop().includes('.')) calcExpr += '.'; }
+        else calcExpr = calcExpr === '0' ? val : calcExpr + val;
         document.getElementById('calc-display').textContent = calcExpr;
       });
     });
@@ -1244,40 +1539,28 @@
 
       if (addMode === 'daily') {
         state.transactions.push({
-          id: 'tx_' + Date.now(),
-          amount,
-          category: addCat,
-          note,
-          date,
-          createdAt: Date.now()
+          id: 'tx_' + Date.now(), amount, category: addCat, note, date, createdAt: Date.now()
         });
         saveState();
         addModal.classList.remove('open');
         renderHome();
         showToast(`已記錄 ${fmtHKD(amount)}`);
       } else {
-        const tid = document.getElementById('add-trip-select').value;
-        const trip = state.trips.find(t => t.id === tid);
+        const trip = state.trips.find(t => t.id === document.getElementById('add-trip-select').value);
         if (!trip) return;
         const hkdAmount = Math.round(amount * trip.rate * 10) / 10;
         trip.expenses.push({
-          id: 'texp_' + Date.now(),
-          localAmount: amount,
-          hkdAmount,
-          category: addCat,
-          note,
-          date,
-          createdAt: Date.now()
+          id: 'texp_' + Date.now(), localAmount: amount, hkdAmount,
+          category: addCat, note, date, createdAt: Date.now()
         });
         state.activeTripId = trip.id;
         saveState();
         addModal.classList.remove('open');
         renderTravel();
-        showToast(`已記錄 ${trip.currency} ${amount} (≈ ${fmtHKD(hkdAmount)})`);
+        showToast(`已記錄 ${trip.currency} ${amount}`);
       }
     }
 
-    // Initial render
     renderHome();
   </script>
 </body>
